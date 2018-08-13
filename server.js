@@ -7,7 +7,7 @@ var cheerio = require("cheerio");
 
 // Initializing Express
 var app = express();
-var URL = "https://en.wikipedia.org/wiki/Africa#Economy";
+var URL = "https://www.gamespot.com/news/";
 
 // database config 
 var databaseUrl = "scrapper";
@@ -15,7 +15,7 @@ var collections = ["scrappedData"];
 var db = mongojs(databaseUrl, collections);
 
 db.on("error", function (error) {
-    console.log("database error: ", error);
+    // console.log("database error: ", error);
 });
 
 app.get("/", function (req, res) {
@@ -24,24 +24,43 @@ app.get("/", function (req, res) {
 app.get("/get", function (req, res) {
     request(URL, function (err, res, body) {
         var $ = cheerio.load(body);
-        var result = [];
+        var results = [];
 
-        $("tbody").each(function (i, element) {
+        $(".media-article").each(function (i, element) {
 
-            var link = $(element).children().attr("href");
-            var title = $(element).children().text();
+            var title = $(this).children("a").children(".media-body").children("h3").text();
+            var link = $(this).children("a").attr("href");
+            var fullLink = "https://www.gamespot.com" + link;
+            var summary = $(this).children("a").children(".media-body").children("p").text();
+            // var title = $(this).children().text();
+            console.log("--------------------------------------------");
+            console.log(title);
+            console.log(fullLink);
+            console.log(summary);
 
-            result.push({
-                title: title,
-                link: link
-            });
+            if (title && summary && link) {
+
+                results.push({
+                    title: title,
+                    link: fullLink,
+                    summary: summary
+                });
+                db.scrapper.insert({
+                    title: title,
+                    link: fullLink,
+                    summary: summary
+                });
+
+            }
 
         });
-        // console.log(result);
-        db.scrapper.insert({
-            result
+        db.scrapper.insert(results, {
+            ordered: false
         });
-        res.toJSON(result);
+        // {
+        //     results
+        // });
+        res.toJSON(results);
     });
 });
 app.get("/find", function (req, res) {
@@ -51,6 +70,7 @@ app.get("/find", function (req, res) {
         res.json(data);
     });
 });
+
 
 
 app.listen(8080, function () {
