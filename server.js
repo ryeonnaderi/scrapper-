@@ -33,22 +33,25 @@ app.get("/get", function (req, res) {
             var fullLink = "https://www.gamespot.com" + link;
             var summary = $(this).children("a").children(".media-body").children("p").text();
             // var title = $(this).children().text();
+            var img = $(this).children("a").children("media-img");
             console.log("--------------------------------------------");
             console.log(title);
             console.log(fullLink);
             console.log(summary);
 
-            if (title && summary && link) {
+            if (title && summary && link &&img) {
 
                 results.push({
                     title: title,
                     link: fullLink,
-                    summary: summary
+                    summary: summary,
+                    img = img
                 });
                 db.scrapper.insert({
                     title: title,
                     link: fullLink,
-                    summary: summary
+                    summary: summary,
+                    img = img
                 });
 
             }
