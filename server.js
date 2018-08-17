@@ -14,19 +14,19 @@ var databaseUrl = "scrapper";
 var collections = ["scrappedData"];
 var db = mongojs(databaseUrl, collections);
 
-db.on("error", function (error) {
-    // console.log("database error: ", error);
+db.on("error",  (error) => {
+     console.log("database error: ", error);
 });
 
-app.get("/", function (req, res) {
+app.get("/",  (req, res) =>  {
     res.send("Hello world");
 });
-app.get("/get", function (req, res) {
-    request(URL, function (err, res, body) {
+app.get("/get",  (req, res)=> {
+    request(URL,  (err, res, body) => {
         var $ = cheerio.load(body);
         var results = [];
 
-        $(".media-article").each(function (i, element) {
+        $(".media-article").each( (i, element) => {
 
             var title = $(this).children("a").children(".media-body").children("h3").text();
             var link = $(this).children("a").attr("href");
@@ -63,9 +63,9 @@ app.get("/get", function (req, res) {
         res.toJSON(results);
     });
 });
-app.get("/find", function (req, res) {
+app.get("/find",  (req, res) => {
 
-    db.scrapper.find({}, function (err, data) {
+    db.scrapper.find({},  (err, data) => {
         console.log(res);
         res.json(data);
     });
@@ -73,6 +73,6 @@ app.get("/find", function (req, res) {
 
 
 
-app.listen(8080, function () {
+app.listen(8080,  () => {
     console.log("app is running 8080");
 });
